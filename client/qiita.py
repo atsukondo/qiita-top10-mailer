@@ -12,7 +12,6 @@ class QiitaAPIClient:
         self.headers = self._build_headers()
     
     def _build_headers(self) -> Dict[str, str]:
-        """認証ヘッダーを構築"""
         headers = {"Accept": "application/json"}
         if self.access_token:
             headers["Authorization"] = f"Bearer {self.access_token}"
@@ -27,7 +26,7 @@ class QiitaAPIClient:
         url = f"{self.BASE_URL}/items"
         params = {
             "page": page,
-            "per_page": min(per_page, 100),  # 最大100まで
+            "per_page": min(per_page, 100),
         }
         
         if query:
@@ -58,12 +57,11 @@ class QiitaAPIClient:
     @staticmethod
     def format_items_for_email(items: List[Dict[str, Any]]) -> str:
         if not items:
-            return "取得できる記事がありません。"
+            return "No articles available."
         
         formatted_text = ""
         
         for i, item in enumerate(items, 1):
-            # 日時フォーマット
             created_at = QiitaAPIClient._format_datetime(item.get("created_at"))
             
             # タグ情報
@@ -91,24 +89,21 @@ class QiitaAPIClient:
         return formatted_text
     
     @staticmethod
+    def generate_email_subject(items: List[Dict[str, Any]], query: Optional[str] = None) -> str:
+        """Generate email subject based on items count and query"""
+        count = len(items)
+        if query:
+            return f"Qiita Top {count} Articles - {query}"
+        else:
+            return f"Qiita Top {count} Articles"
+    
+    @staticmethod
     def _format_datetime(datetime_str: Optional[str]) -> str:
         if not datetime_str:
-            return "不明"
+            return "Unknown"
         
         try:
-            # ISO 8601形式をパース
             dt = datetime.fromisoformat(datetime_str.replace("Z", "+00:00"))
-            # 見やすい形式に変換
             return dt.strftime("%Y-%m-%d %H:%M")
         except (ValueError, AttributeError):
             return datetime_str
-    
-
-
-if __name__ == "__main__":
-    # 使用例
-    client = QiitaAPIClient()
-    items = client.get_items(per_page=10, query="LLM")
-    
-    # メール用に整形
-    email_content = QiitaAPIClient.format_items_for_email(items)
