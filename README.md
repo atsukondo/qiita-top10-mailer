@@ -1,0 +1,1 @@
+# qiita-top10-mailer
