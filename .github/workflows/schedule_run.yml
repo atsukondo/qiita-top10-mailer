@@ -2,8 +2,8 @@ name: Scheduled Execution
 
 on:
   schedule:
-    # 日本時間 12:30 (UTC 3:30)
-    - cron: '30 3 27 12 *'
+    # 毎日 日本時間 07:00 (UTC 22:00) に実行
+    - cron: '0 22 * * *'
 
 jobs:
   build:
